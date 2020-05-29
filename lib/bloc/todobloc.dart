@@ -26,6 +26,15 @@ class TodoTickEvent extends TodoEvent {
   List<Object> get props => [index];
 }
 
+class TodoDeleteEvent extends TodoEvent {
+  final int index;
+
+  TodoDeleteEvent({@required this.index});
+
+  @override
+  List<Object> get props => [index];
+}
+
 class TodoState extends Equatable {
   final List<TodoItem> todoItems;
 
@@ -53,6 +62,12 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     if (event is TodoTickEvent) {
       List<TodoItem> newtodoItems = List.from(state.todoItems);
       newtodoItems[event.index] = TodoItem(text: state.todoItems[event.index].text, done:!state.todoItems[event.index].done);
+      yield TodoState(todoItems: newtodoItems);
+    }
+
+    if (event is TodoDeleteEvent) {
+      List<TodoItem> newtodoItems = List.from(state.todoItems);
+      newtodoItems.removeAt(event.index);
       yield TodoState(todoItems: newtodoItems);
     }
   }

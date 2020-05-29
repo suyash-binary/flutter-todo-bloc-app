@@ -5,7 +5,6 @@ import 'package:bloc_todo_app/entity/todoitem.dart';
 import 'package:bloc_todo_app/widgets/addTodoDialog.dart';
 
 class TodoPage extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     // ignore: close_sinks
@@ -21,26 +20,35 @@ class TodoPage extends StatelessWidget {
             padding: EdgeInsets.all(10),
             itemCount: state.todoItems.length,
             itemBuilder: (BuildContext context, int index) {
-              return Container(
-                  child: Container(
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        '${state.todoItems[index].text}',
-                        style: TextStyle(
-                            decoration: state.todoItems[index].done
-                                ? TextDecoration.lineThrough
-                                : TextDecoration.none),
+              return Dismissible(
+                key: Key('$index - ${state.todoItems[index].text}'),
+                onDismissed: (direction) {
+                  todoBloc.add(TodoDeleteEvent(index: index));
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text("Removed ${state.todoItems[index].text}")));
+                },
+                background: Container(color: Colors.red),
+                child: Container(
+                    child: Container(
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          '${state.todoItems[index].text}',
+                          style: TextStyle(
+                              decoration: state.todoItems[index].done
+                                  ? TextDecoration.lineThrough
+                                  : TextDecoration.none),
+                        ),
                       ),
-                    ),
-                    Checkbox(
-                        value: state.todoItems[index].done,
-                        onChanged: (newvalue) {
-                          todoBloc.add(TodoTickEvent(index: index));
-                        })
-                  ])));
+                      Checkbox(
+                          value: state.todoItems[index].done,
+                          onChanged: (newvalue) {
+                            todoBloc.add(TodoTickEvent(index: index));
+                          })
+                    ]))),
+              );
             },
             separatorBuilder: (BuildContext context, int index) =>
                 const Divider(),
